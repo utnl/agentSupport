@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    .card {
+      background: rgba(20, 18, 30, 0.96);
+      border: 1px solid rgba(255, 210, 60, 0.4);
+      border-radius: 20px;
+      padding: 20px 24px;
+      width: 380px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 8px 40px rgba(255, 210, 60, 0.2), 0 2px 12px rgba(0,0,0,0.6);
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .avatar {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      flex-shrink: 0;
+      animation: bounce 0.6s ease infinite alternate;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-6px); }
+    }
+
+    .content {
+      flex: 1;
+    }
+
+    .title {
+      font-size: 0.75rem;
+      color: #ffd23c;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .message {
+      font-size: 1rem;
+      color: #fff;
+      font-weight: 500;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: #aaa;
+      font-size: 1rem;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .close-btn:hover { background: rgba(255,80,80,0.3); color: #fff; }
+
+    .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: #ffd23c;
+      border-radius: 0 0 20px 20px;
+      animation: shrink 5s linear forwards;
+    }
+
+    @keyframes shrink {
+      from { width: 100%; }
+      to   { width: 0%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img class="avatar" src="banana.png" alt="Banana Cat" />
+    <div class="content">
+      <div class="title">⏰ Banana Cat nhắc bạn!</div>
+      <div class="message" id="msg">Đang tải...</div>
+    </div>
+    <button class="close-btn" onclick="closeWindow()">✕</button>
+    <div class="progress"></div>
+  </div>
+
+  <script type="module">
+    import { getCurrentWindow } from "https://unpkg.com/@tauri-apps/api@2/window.js";
+    import { listen } from "https://unpkg.com/@tauri-apps/api@2/event.js";
+
+    const win = getCurrentWindow();
+
+    // Nhận message từ Rust
+    await listen("notify-message", (event) => {
+      document.getElementById("msg").textContent = event.payload;
+    });
+
+    // 5s tự đóng
+    setTimeout(() => win.close(), 5000);
+
+    window.closeWindow = () => win.close();
+  </script>
+</body>
+</html>
