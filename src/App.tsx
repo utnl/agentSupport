@@ -60,7 +60,6 @@ function TranscribeTab({ pythonReady }: { pythonReady: boolean | null }) {
   const [transcript, setTranscript] = useState<TranscriptItem[]>([]);
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
-  const processRef = useRef<any>(null);
 
   useEffect(() => {
     if (!isTauri) return;
@@ -70,7 +69,7 @@ function TranscribeTab({ pythonReady }: { pythonReady: boolean | null }) {
       
       // Listen for draft transcripts (fast preview - incremental)
       const u1 = await listen<{ text: string; draft_id: string; lang: string; is_incremental?: boolean }>("transcribe-draft", (e) => {
-        const { text, draft_id, is_incremental } = e.payload;
+        const { text, draft_id } = e.payload;
         setTranscript((prev) => {
           const existingIndex = prev.findIndex(t => t.draftId === draft_id && t.type === "draft");
           
